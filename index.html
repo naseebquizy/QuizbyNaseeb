@@ -1,0 +1,157 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Neon MCQ Test</title>
+  <style>
+    body {
+      background-color: #0f0f0f;
+      color: #fff;
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    h1 {
+      color: #0ff;
+      text-shadow: 0 0 10px #0ff;
+    }
+    .question-box, .result-box {
+      border: 2px solid #0ff;
+      border-radius: 10px;
+      padding: 20px;
+      margin: 20px;
+      width: 90%;
+      max-width: 600px;
+      background: #1a1a1a;
+      box-shadow: 0 0 10px #0ff;
+    }
+    button {
+      background-color: #0ff;
+      color: #000;
+      border: none;
+      padding: 10px 20px;
+      font-size: 16px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin: 10px 0;
+    }
+    button:hover {
+      background-color: #00cccc;
+    }
+    .options button {
+      display: block;
+      width: 100%;
+      margin-bottom: 10px;
+    }
+    #timer {
+      font-size: 18px;
+      margin-top: 10px;
+      color: #0f0;
+    }
+  </style>
+</head>
+<body>
+  <h1>Neon MCQ Test</h1>
+  <div id="start-box">
+    <button onclick="startTest()">Start Test</button>
+  </div>
+  <div id="quiz-box" class="question-box" style="display:none">
+    <div id="timer">Time: 0s</div>
+    <div id="q-no"></div>
+    <div id="question"></div>
+    <div class="options" id="options"></div>
+  </div>
+  <div id="result" class="result-box" style="display:none"></div>  <script>
+    const questions = [
+      {
+        question: "Capital of France?",
+        options: ["Berlin", "Madrid", "Paris", "Lisbon"],
+        answer: 2
+      },
+      {
+        question: "5 + 7 = ?",
+        options: ["10", "11", "12", "13"],
+        answer: 2
+      },
+      {
+        question: "Fastest land animal?",
+        options: ["Lion", "Tiger", "Cheetah", "Leopard"],
+        answer: 2
+      },
+      {
+        question: "Water formula?",
+        options: ["H2O", "CO2", "O2", "NaCl"],
+        answer: 0
+      }
+    ];
+
+    let selectedQuestions = [];
+    let currentQ = 0, correct = 0, startTime;
+    const qNo = document.getElementById('q-no');
+    const question = document.getElementById('question');
+    const options = document.getElementById('options');
+    const timer = document.getElementById('timer');
+    let timerInterval;
+
+    function startTest() {
+      selectedQuestions = [...questions].sort(() => 0.5 - Math.random()).slice(0, 3); // Select 3 questions randomly
+      currentQ = 0;
+      correct = 0;
+      document.getElementById('start-box').style.display = 'none';
+      document.getElementById('quiz-box').style.display = 'block';
+      startTime = Date.now();
+      timerInterval = setInterval(updateTimer, 1000);
+      showQuestion();
+    }
+
+    function updateTimer() {
+      const elapsed = Math.floor((Date.now() - startTime) / 1000);
+      timer.textContent = `Time: ${elapsed}s`;
+    }
+
+    function showQuestion() {
+      const q = selectedQuestions[currentQ];
+      qNo.innerText = `Question ${currentQ + 1} of ${selectedQuestions.length}`;
+      question.innerText = q.question;
+      options.innerHTML = '';
+      q.options.forEach((opt, i) => {
+        const btn = document.createElement('button');
+        btn.innerText = opt;
+        btn.onclick = () => checkAnswer(i);
+        options.appendChild(btn);
+      });
+    }
+
+    function checkAnswer(selected) {
+      const correctIndex = selectedQuestions[currentQ].answer;
+      if (selected === correctIndex) correct++;
+      currentQ++;
+      if (currentQ < selectedQuestions.length) {
+        showQuestion();
+      } else {
+        endTest();
+      }
+    }
+
+    function endTest() {
+      clearInterval(timerInterval);
+      const timeTaken = Math.floor((Date.now() - startTime) / 1000);
+      document.getElementById('quiz-box').style.display = 'none';
+      const total = selectedQuestions.length;
+      const wrong = total - correct;
+      document.getElementById('result').style.display = 'block';
+      document.getElementById('result').innerHTML = `
+        <h2>Test Completed!</h2>
+        <p>Total Questions Entered: ${questions.length}</p>
+        <p>Questions in this Test: ${total}</p>
+        <p>Correct Answers: ${correct}</p>
+        <p>Wrong Answers: ${wrong}</p>
+        <p>Total Time: ${timeTaken} seconds</p>
+        <button onclick="location.reload()">Restart</button>
+      `;
+    }
+  </script></body>
+  </html>
